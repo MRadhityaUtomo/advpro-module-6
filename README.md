@@ -32,3 +32,91 @@ Based on the Rust documentation:
 - `format!` is used to add the file’s contents as the body of the success response. To ensure a valid HTTP response, we add the `Content-Length` header which is set to the size of our response body, in this case the size of `hello.html`.
 
 The process includes sending a line response that validates a success with the code `200 OK`. Once it detects an OK it will read the html file, in this case `hello.html` and as stated above, it's size is counted and put in header response.
+
+3. [Commit] Add additional reflection notes, put the title clearly such
+as Commit 3 Reflection notes. Commit your work with message
+“(3) Validating request and selectively responding”. Push your
+commit. 
+
+### Commit 3 Reflection Notes 
+
+Currently, the web will return `hello.html` regardless of the request sent.
+
+We can simply divide the desired request by using `if` and `else` blocks. Basically, if the request is visibile, and has a response with either a render of an html file or some other way do this, else do this.
+
+Based on the Rust Documentation: 
+
+```rust
+let buf_reader = BufReader::new(&mut stream);
+let request_line = buf_reader.lines().next().unwrap().unwrap();
+
+if request_line == "GET / HTTP/1.1" {
+    let status_line = "HTTP/1.1 200 OK";
+    let contents = fs::read_to_string("hello.html").unwrap();
+    let length = contents.len();
+
+    let response = format!(
+        "{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}"
+    );
+
+    stream.write_all(response.as_bytes()).unwrap();
+} else {
+    let status_line = "HTTP/1.1 404 NOT FOUND";
+    let contents = fs::read_to_string("404.html").unwrap();
+    let length = contents.len();
+
+    let response = format!(
+        "{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}"
+    );
+
+    stream.write_all(response.as_bytes()).unwrap();
+}
+```
+
+`request_line` being the request sent and checked by the if-else blocks, and status line being the response given to that request.
+for this module, I made a `404.html` as in "404 page not found" to be a response to unfound requests.
+
+`404.html` :
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Hello!</title>
+  </head>
+  <body>
+    <h1>Oops!</h1>
+    <p>Sorry, your request was not found.</p>
+  </body>
+</html>
+```
+with the end result by accessing `http://127.0.0.1:7878/bad` being:
+![Commit 3 screen capture](/assets/images/commit3_notfound.jpg)
+
+Next we should refactor the code to make it more readable and clean.
+- Conjoin the 2 if-else blocks and seperate them from their own similar code. Basically only having the `status_line` for the response
+- Extract methods after the first point to clean up the format of the code by removing unnecessary lines.
+- Overall improve maintanability and achieving the ability for modification of each if-else statements easily
+
+resulting code: 
+```rust
+fn handle_connection(mut stream: TcpStream) {
+    let buf_reader = BufReader::new(&mut stream);
+    let request_line = buf_reader.lines().next().unwrap().unwrap();
+
+    let (status_line, filename) = if request_line == "GET / HTTP/1.1" {
+        ("HTTP/1.1 200 OK", "hello.html")
+    } else {
+        ("HTTP/1.1 404 NOT FOUND", "404.html")
+    };
+
+    let contents = fs::read_to_string(filename).unwrap();
+    let length = contents.len();
+
+    let response =
+        format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
+
+    stream.write_all(response.as_bytes()).unwrap();
+}
+```
+
