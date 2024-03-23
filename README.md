@@ -145,3 +145,16 @@ We can make a multithreading system by creating a ThreadPool.
 A ThreadPool is as per what it says, a pool of threads with each thread ready to handle a request.
 
 Next we need a Worker that accepts and runs more specific jobs. We can connect the ThreadPool and Worker by making a new code that makes the ThreadPool able to send a signal through sender to receiver that has been cloned and assigned to each Worker. This enables when the ThreadPool accepts a request, the signal will be sent and assign the request to a valid Worker which will then process the request. Worker then locks the receiver to process the data until it's finished, and only then will the lock be unlocked and enables other Workers to accept other jobs.
+
+<br>
+<br>
+
+[BONUS] 
+Bonus: Try to create a function build as a replacement to new and
+compare.
+(Bonus) [Commit] Add additional reflection notes, put the title clearly such
+as Commit Bonus Reflection notes. Commit your work with message
+“(Bonus) Function improvement“
+
+### Bonus Implementation
+- Changing the thread creation to `build` instead of `new` will enable error-handling restrictions, such as having <= 0 will return an error.
