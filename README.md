@@ -120,3 +120,16 @@ fn handle_connection(mut stream: TcpStream) {
 }
 ```
 
+4. [Commit] Add additional reflection notes, put the title clearly such
+as Commit 4 Reflection notes. Commit your work with message
+“(4) Simulation of slow request. “
+
+### Commit 4 Reflection Notes 
+
+Currently the server is running on single thread, meaning with enough abundant of users accessing the web, it will suffer negatives and slow down.
+
+We can simulate a slowing down event by integrating sleep to the thread.
+- By changing the `if` block in `handle_connection` to `match` to "match" the value of `request_line` with the desired endpoints (`/`,`/sleep`,and none).
+- The new `/sleep` endpoint has the `thread::sleep(Duration::from_secs(5));`. This is how a single-threaded server handles a multi-threaded process by delaying the process by 5 seconds.
+
+With this, by opening 2 browsers are opened and repectively access `127.0.0.1/sleep` and `127.0.0.1`, the server will delay other responses thus blocking other a access to the servers with a single-thread.
