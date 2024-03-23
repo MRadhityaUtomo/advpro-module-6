@@ -133,3 +133,15 @@ We can simulate a slowing down event by integrating sleep to the thread.
 - The new `/sleep` endpoint has the `thread::sleep(Duration::from_secs(5));`. This is how a single-threaded server handles a multi-threaded process by delaying the process by 5 seconds.
 
 With this, by opening 2 browsers are opened and repectively access `127.0.0.1/sleep` and `127.0.0.1`, the server will delay other responses thus blocking other a access to the servers with a single-thread.
+
+
+5. [Commit] Add additional reflection notes, put the title clearly such
+as Commit 5 Reflection notes. Commit your work with message
+“(5) Multithreaded server using Threadpool “
+
+### Commit 5 Reflection Notes 
+
+We can make a multithreading system by creating a ThreadPool.
+A ThreadPool is as per what it says, a pool of threads with each thread ready to handle a request.
+
+Next we need a Worker that accepts and runs more specific jobs. We can connect the ThreadPool and Worker by making a new code that makes the ThreadPool able to send a signal through sender to receiver that has been cloned and assigned to each Worker. This enables when the ThreadPool accepts a request, the signal will be sent and assign the request to a valid Worker which will then process the request. Worker then locks the receiver to process the data until it's finished, and only then will the lock be unlocked and enables other Workers to accept other jobs.
